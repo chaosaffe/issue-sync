@@ -1,3 +1,9 @@
+# WIP: This is a heavy rework of issue-sync, which may or may not be accepted upstream.
+
+The documentation below **does not** represent the current state of the project.
+For usage you will have to read the code while the refactoring is underway.
+
+
 # issue-sync
 
 Issue-sync is a tool for synchronizing GitHub and JIRA issues. It grew
