@@ -10,6 +10,8 @@ GOARCH=$(shell go env GOARCH)
 SOURCES := $(shell find . -name '*.go')
 LD_FLAGS=-ldflags "-X $(REPO_PATH)/cmd.Version=$(VERSION)"
 
+GOBIN_DEFAULT := $(GOPATH)/bin
+export GOBIN ?= $(GOBIN_DEFAULT)
 HAS_DEP := $(shell command -v dep;)
 
 
@@ -36,6 +38,6 @@ bin/$(PROJ): $(SOURCES)
 clean:
 	@rm bin/*
 
-.PHONY: clean depend
+.PHONY: clean depend build
 
 .DEFAULT_GOAL: build

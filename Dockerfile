@@ -6,8 +6,8 @@ RUN apk update --no-cache && apk add ca-certificates
 
 COPY bin/issue-sync /opt/issue-sync/issue-sync
 
-COPY config.json /opt/issue-sync/config.json
+COPY config.yaml /opt/issue-sync/config.yaml
 
 ENTRYPOINT ["./issue-sync"]
 
-CMD ["--config", "config.json"]
+CMD ["--config", "config.yaml"]

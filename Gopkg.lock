@@ -25,19 +25,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:f2ceb37cd998845bbcf016aa4e9a5eac23231e382edbbd61e4d6bd082a274641"
-  name = "github.com/coreos/issue-sync"
-  packages = [
-    "cfg",
-    "cmd",
-    "lib",
-    "lib/clients",
-  ]
-  pruneopts = "UT"
-  revision = "da2a3248854d3ad86f473fabdfcdc7083db6386a"
-
-[[projects]]
   digest = "1:144f5984ed1f07aa8fa2468844f856b1ac8e93ac94e1fd19fbf69ce034d9ef92"
   name = "github.com/dghubble/oauth1"
   packages = ["."]
@@ -267,10 +254,10 @@
     "github.com/Sirupsen/logrus",
     "github.com/andygrunwald/go-jira",
     "github.com/cenkalti/backoff",
-    "github.com/coreos/issue-sync/cfg",
-    "github.com/coreos/issue-sync/cmd",
-    "github.com/coreos/issue-sync/lib",
-    "github.com/coreos/issue-sync/lib/clients",
+    "github.com/chaosaffe/issue-sync/cfg",
+    "github.com/chaosaffe/issue-sync/cmd",
+    "github.com/chaosaffe/issue-sync/lib",
+    "github.com/chaosaffe/issue-sync/lib/clients",
     "github.com/dghubble/oauth1",
     "github.com/fsnotify/fsnotify",
     "github.com/google/go-github/github",

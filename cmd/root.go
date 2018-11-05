@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/coreos/issue-sync/cfg"
-	"github.com/coreos/issue-sync/lib"
-	"github.com/coreos/issue-sync/lib/clients"
+	"github.com/chaosaffe/issue-sync/pkg/config"
+	"github.com/chaosaffe/issue-sync/pkg/github"
+	"github.com/chaosaffe/issue-sync/pkg/jira"
+	"github.com/chaosaffe/issue-sync/pkg/sync"
 	"github.com/spf13/cobra"
 )
 
@@ -23,26 +24,26 @@ func Execute() {
 var RootCmd = &cobra.Command{
 	Use:   "issue-sync [options]",
 	Short: "A tool to synchronize GitHub and JIRA issues",
-	Long:  "Full docs coming later; see https://github.com/coreos/issue-sync",
+	Long:  "Full docs coming later; see https://github.com/chaosaffe/issue-sync",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		config, err := cfg.NewConfig(cmd)
+		config, err := config.NewConfig(cmd)
 		if err != nil {
 			return err
 		}
 
 		log := config.GetLogger()
 
-		jiraClient, err := clients.NewJIRAClient(&config)
+		jiraClient, err := jira.NewJIRAClient(&config)
 		if err != nil {
 			return err
 		}
-		ghClient, err := clients.NewGitHubClient(config)
+		ghClient, err := github.NewGitHubClient(config)
 		if err != nil {
 			return err
 		}
 
 		for {
-			if err := lib.CompareIssues(config, ghClient, jiraClient); err != nil {
+			if err := sync.CompareIssues(config, ghClient, jiraClient); err != nil {
 				log.Error(err)
 			}
 			if !config.IsDryRun() {
