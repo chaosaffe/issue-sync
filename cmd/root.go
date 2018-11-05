@@ -26,35 +26,38 @@ var RootCmd = &cobra.Command{
 	Short: "A tool to synchronize GitHub and JIRA issues",
 	Long:  "Full docs coming later; see https://github.com/chaosaffe/issue-sync",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		config, err := config.NewConfig(cmd)
+		cfg, err := config.NewConfig(cmd)
 		if err != nil {
 			return err
 		}
 
-		log := config.GetLogger()
+		log := cfg.GetLogger()
 
-		jiraClient, err := jira.NewJIRAClient(&config)
+		jiraClient, err := jira.NewJIRAClient(&cfg)
 		if err != nil {
 			return err
 		}
-		ghClient, err := github.NewGitHubClient(config)
+		ghClient, err := github.NewGitHubClient(cfg)
 		if err != nil {
 			return err
 		}
 
 		for {
-			if err := sync.CompareIssues(config, ghClient, jiraClient); err != nil {
+			err := sync.Sync(cfg, ghClient, jiraClient)
+			if err != nil {
 				log.Error(err)
 			}
-			if !config.IsDryRun() {
-				if err := config.SaveConfig(); err != nil {
+
+			if !cfg.IsDryRun() {
+				err := cfg.SaveConfig()
+				if err != nil {
 					log.Error(err)
 				}
 			}
-			if !config.IsDaemon() {
+			if !cfg.IsDaemon() {
 				return nil
 			}
-			<-time.After(config.GetDaemonPeriod())
+			<-time.After(cfg.GetDaemonPeriod())
 		}
 	},
 }

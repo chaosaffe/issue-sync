@@ -18,13 +18,10 @@ const dateFormat = "2006-01-02T15:04:05-0700"
 // gets the list of JIRA issues which have GitHub ID custom fields in that list,
 // then matches each one. If a JIRA issue already exists for a given GitHub issue,
 // it calls UpdateIssue; if no JIRA issue already exists, it calls CreateIssue.
-func CompareIssues(cfg config.Config, ghClient ghClient.GitHubClient, jiraClient jClient.JIRAClient) error {
+func CompareIssues(cfg config.Config, ghIssues []github.Issue, ghClient ghClient.GitHubClient, jiraClient jClient.JIRAClient) error {
 	log := cfg.GetLogger()
 
 	log.Debug("Collecting issues")
-
-	// TODO: Hack to compile for now
-	ghIssues := []github.Issue{}
 
 	if len(ghIssues) == 0 {
 		log.Info("There are no GitHub issues; exiting")
