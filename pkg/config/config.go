@@ -200,7 +200,6 @@ func newViper(appName, cfgFile string) *viper.Viper {
 	if cfgFile != "" {
 		v.SetConfigFile(cfgFile)
 	}
-	v.SetConfigType("json")
 
 	if err := v.ReadInConfig(); err == nil {
 		log.WithField("file", v.ConfigFileUsed()).Infof("config file loaded")
