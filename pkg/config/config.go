@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/andygrunwald/go-jira"
-	"github.com/dghubble/oauth1"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,28 +23,6 @@ const dateFormat = "2006-01-02T15:04:05-0700"
 
 // defaultLogLevel is the level logrus should default to if the configured option can't be parsed
 const defaultLogLevel = logrus.InfoLevel
-
-// fieldKey is an enum-like type to represent the customfield ID keys
-type fieldKey int
-
-const (
-	GitHubID       fieldKey = iota
-	GitHubNumber   fieldKey = iota
-	GitHubLabels   fieldKey = iota
-	GitHubStatus   fieldKey = iota
-	GitHubReporter fieldKey = iota
-	LastISUpdate   fieldKey = iota
-)
-
-// fields represents the custom field IDs of the JIRA custom fields we care about
-type fields struct {
-	githubID       string
-	githubNumber   string
-	githubLabels   string
-	githubReporter string
-	githubStatus   string
-	lastUpdate     string
-}
 
 // Config is the root configuration object the application creates.
 type Config struct {
@@ -98,32 +74,6 @@ func NewConfig(cmd *cobra.Command) (Config, error) {
 	return config, nil
 }
 
-// LoadJIRAConfig loads the JIRA configuration (project key,
-// custom field IDs) from a remote JIRA server.
-func (c *Config) LoadJIRAConfig(client jira.Client) error {
-	proj, res, err := client.Project.Get(c.cmdConfig.GetString("jira-project"))
-	if err != nil {
-		c.log.Errorf("Error retrieving JIRA project; check key and credentials. Error: %v", err)
-		defer res.Body.Close()
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			c.log.Errorf("Error occured trying to read error body: %v", err)
-			return err
-		}
-
-		c.log.Debugf("Error body: %s", body)
-		return errors.New(string(body))
-	}
-	c.project = *proj
-
-	c.fieldIDs, err = c.getFieldIDs(client)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // GetConfigFile returns the file that Viper loaded the configuration from.
 func (c Config) GetConfigFile() string {
 	return c.cmdFile
@@ -170,31 +120,6 @@ func (c Config) GetTimeout() time.Duration {
 	return c.cmdConfig.GetDuration("timeout")
 }
 
-// GetFieldID returns the customfield ID of a JIRA custom field.
-func (c Config) GetFieldID(key fieldKey) string {
-	switch key {
-	case GitHubID:
-		return c.fieldIDs.githubID
-	case GitHubNumber:
-		return c.fieldIDs.githubNumber
-	case GitHubLabels:
-		return c.fieldIDs.githubLabels
-	case GitHubReporter:
-		return c.fieldIDs.githubReporter
-	case GitHubStatus:
-		return c.fieldIDs.githubStatus
-	case LastISUpdate:
-		return c.fieldIDs.lastUpdate
-	default:
-		return ""
-	}
-}
-
-// GetFieldKey returns customfield_XXXXX, where XXXXX is the custom field ID (see GetFieldID).
-func (c Config) GetFieldKey(key fieldKey) string {
-	return fmt.Sprintf("customfield_%s", c.GetFieldID(key))
-}
-
 // GetProject returns the JIRA project the user has configured.
 func (c Config) GetProject() jira.Project {
 	return c.project
@@ -211,13 +136,6 @@ func (c Config) GetRepo() (string, string) {
 	parts := strings.Split(fullName, "/")
 	// We check that repo-name is two parts separated by a slash in NewConfig, so this is safe
 	return parts[0], parts[1]
-}
-
-// SetJIRAToken adds the JIRA OAuth tokens in the Viper configuration, ensuring that they
-// are saved for future runs.
-func (c Config) SetJIRAToken(token *oauth1.Token) {
-	c.cmdConfig.Set("jira-token", token.Token)
-	c.cmdConfig.Set("jira-secret", token.TokenSecret)
 }
 
 // configFile is a serializable representation of the current Viper configuration.
@@ -425,77 +343,4 @@ func (c *Config) validateConfig() error {
 	c.log.Debug("All config variables are valid!")
 
 	return nil
-}
-
-// jiraField represents field metadata in JIRA. For an example of its
-// structure, make a request to `${jira-uri}/rest/api/2/field`.
-type jiraField struct {
-	ID          string   `json:"id"`
-	Key         string   `json:"key"`
-	Name        string   `json:"name"`
-	Custom      bool     `json:"custom"`
-	Orderable   bool     `json:"orderable"`
-	Navigable   bool     `json:"navigable"`
-	Searchable  bool     `json:"searchable"`
-	ClauseNames []string `json:"clauseNames"`
-	Schema      struct {
-		Type     string `json:"type"`
-		System   string `json:"system,omitempty"`
-		Items    string `json:"items,omitempty"`
-		Custom   string `json:"custom,omitempty"`
-		CustomID int    `json:"customId,omitempty"`
-	} `json:"schema,omitempty"`
-}
-
-// getFieldIDs requests the metadata of every issue field in the JIRA
-// project, and saves the IDs of the custom fields used by issue-sync.
-func (c Config) getFieldIDs(client jira.Client) (fields, error) {
-	c.log.Debug("Collecting field IDs.")
-	req, err := client.NewRequest("GET", "/rest/api/2/field", nil)
-	if err != nil {
-		return fields{}, err
-	}
-	jFields := new([]jiraField)
-
-	_, err = client.Do(req, jFields)
-	if err != nil {
-		return fields{}, err
-	}
-
-	fieldIDs := fields{}
-
-	for _, field := range *jFields {
-		switch field.Name {
-		case "GitHub ID":
-			fieldIDs.githubID = fmt.Sprint(field.Schema.CustomID)
-		case "GitHub Number":
-			fieldIDs.githubNumber = fmt.Sprint(field.Schema.CustomID)
-		case "GitHub Labels":
-			fieldIDs.githubLabels = fmt.Sprint(field.Schema.CustomID)
-		case "GitHub Status":
-			fieldIDs.githubStatus = fmt.Sprint(field.Schema.CustomID)
-		case "GitHub Reporter":
-			fieldIDs.githubReporter = fmt.Sprint(field.Schema.CustomID)
-		case "Last Issue-Sync Update":
-			fieldIDs.lastUpdate = fmt.Sprint(field.Schema.CustomID)
-		}
-	}
-
-	if fieldIDs.githubID == "" {
-		return fieldIDs, errors.New("could not find ID of 'GitHub ID' custom field; check that it is named correctly")
-	} else if fieldIDs.githubNumber == "" {
-		return fieldIDs, errors.New("could not find ID of 'GitHub Number' custom field; check that it is named correctly")
-	} else if fieldIDs.githubLabels == "" {
-		return fieldIDs, errors.New("could not find ID of 'Github Labels' custom field; check that it is named correctly")
-	} else if fieldIDs.githubStatus == "" {
-		return fieldIDs, errors.New("could not find ID of 'Github Status' custom field; check that it is named correctly")
-	} else if fieldIDs.githubReporter == "" {
-		return fieldIDs, errors.New("could not find ID of 'Github Reporter' custom field; check that it is named correctly")
-	} else if fieldIDs.lastUpdate == "" {
-		return fieldIDs, errors.New("could not find ID of 'Last Issue-Sync Update' custom field; check that it is named correctly")
-	}
-
-	c.log.Debug("All fields have been checked.")
-
-	return fieldIDs, nil
 }
