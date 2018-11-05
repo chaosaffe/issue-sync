@@ -131,27 +131,32 @@ func (c Config) GetProjectKey() string {
 }
 
 // GetRepo returns the user/org name and the repo name of the configured GitHub repository.
-func (c Config) GetRepo() (string, string) {
-	fullName := c.cmdConfig.GetString("repo-name")
-	parts := strings.Split(fullName, "/")
-	// We check that repo-name is two parts separated by a slash in NewConfig, so this is safe
-	return parts[0], parts[1]
+func (c Config) GetRepos() []Organisation {
+	cfg := configFile{}
+
+	err := c.cmdConfig.Unmarshal(&cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	return cfg.GitHubRepos
+
 }
 
 // configFile is a serializable representation of the current Viper configuration.
 type configFile struct {
-	LogLevel    string        `json:"log-level" mapstructure:"log-level"`
-	GithubToken string        `json:"github-token" mapstructure:"github-token"`
-	JIRAUser    string        `json:"jira-user" mapstructure:"jira-user"`
-	JIRAToken   string        `json:"jira-token" mapstructure:"jira-token"`
-	JIRASecret  string        `json:"jira-secret" mapstructure:"jira-secret"`
-	JIRAKey     string        `json:"jira-private-key-path" mapstructure:"jira-private-key-path"`
-	JIRACKey    string        `json:"jira-consumer-key" mapstructure:"jira-consumer-key"`
-	RepoName    string        `json:"repo-name" mapstructure:"repo-name"`
-	JIRAURI     string        `json:"jira-uri" mapstructure:"jira-uri"`
-	JIRAProject string        `json:"jira-project" mapstructure:"jira-project"`
-	Since       string        `json:"since" mapstructure:"since"`
-	Timeout     time.Duration `json:"timeout" mapstructure:"timeout"`
+	LogLevel    string         `json:"log-level" mapstructure:"log-level"`
+	GithubToken string         `json:"github-token" mapstructure:"github-token"`
+	GitHubRepos []Organisation `json:"repos" mapstructure:"repos"`
+	JIRAUser    string         `json:"jira-user" mapstructure:"jira-user"`
+	JIRAToken   string         `json:"jira-token" mapstructure:"jira-token"`
+	JIRASecret  string         `json:"jira-secret" mapstructure:"jira-secret"`
+	JIRAKey     string         `json:"jira-private-key-path" mapstructure:"jira-private-key-path"`
+	JIRACKey    string         `json:"jira-consumer-key" mapstructure:"jira-consumer-key"`
+	JIRAURI     string         `json:"jira-uri" mapstructure:"jira-uri"`
+	JIRAProject string         `json:"jira-project" mapstructure:"jira-project"`
+	Since       string         `json:"since" mapstructure:"since"`
+	Timeout     time.Duration  `json:"timeout" mapstructure:"timeout"`
 }
 
 // SaveConfig updates the `since` parameter to now, then saves the configuration file.

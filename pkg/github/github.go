@@ -85,44 +85,50 @@ func (g realGHClient) ListIssues() ([]github.Issue, error) {
 
 	ctx := context.Background()
 
-	user, repo := g.config.GetRepo()
+	orgs := g.config.GetRepos()
 
-	// Set it so that it will run the loop once, and it'll be updated in the loop.
-	pages := 1
 	var issues []github.Issue
 
-	for page := 1; page <= pages; page++ {
-		is, res, err := g.request(func() (interface{}, *github.Response, error) {
-			return g.client.Issues.ListByRepo(ctx, user, repo, &github.IssueListByRepoOptions{
-				Since:     g.config.GetSinceParam(),
-				State:     "all",
-				Sort:      "created",
-				Direction: "asc",
-				ListOptions: github.ListOptions{
-					Page:    page,
-					PerPage: 100,
-				},
-			})
-		})
-		if err != nil {
-			return nil, err
-		}
-		issuePointers, ok := is.([]*github.Issue)
-		if !ok {
-			log.Errorf("Get GitHub issues did not return issues! Got: %v", is)
-			return nil, fmt.Errorf("get GitHub issues failed: expected []*github.Issue; got %T", is)
-		}
+	for _, user := range orgs {
+		for _, repo := range user.Repos {
 
-		var issuePage []github.Issue
-		for _, v := range issuePointers {
-			// If PullRequestLinks is not nil, it's a Pull Request
-			if v.PullRequestLinks == nil {
-				issuePage = append(issuePage, *v)
+			// Set it so that it will run the loop once, and it'll be updated in the loop.
+			pages := 1
+
+			for page := 1; page <= pages; page++ {
+				is, res, err := g.request(func() (interface{}, *github.Response, error) {
+					return g.client.Issues.ListByRepo(ctx, user.Name, repo, &github.IssueListByRepoOptions{
+						Since:     g.config.GetSinceParam(),
+						State:     "all",
+						Sort:      "created",
+						Direction: "asc",
+						ListOptions: github.ListOptions{
+							Page:    page,
+							PerPage: 100,
+						},
+					})
+				})
+				if err != nil {
+					return nil, err
+				}
+				issuePointers, ok := is.([]*github.Issue)
+				if !ok {
+					log.Errorf("Get GitHub issues did not return issues! Got: %v", is)
+					return nil, fmt.Errorf("get GitHub issues failed: expected []*github.Issue; got %T", is)
+				}
+
+				var issuePage []github.Issue
+				for _, v := range issuePointers {
+					// If PullRequestLinks is not nil, it's a Pull Request
+					if v.PullRequestLinks == nil {
+						issuePage = append(issuePage, *v)
+					}
+				}
+
+				pages = res.LastPage
+				issues = append(issues, issuePage...)
 			}
 		}
-
-		pages = res.LastPage
-		issues = append(issues, issuePage...)
 	}
 
 	log.Debug("Collected all GitHub issues")
@@ -136,9 +142,8 @@ func (g realGHClient) ListComments(issue github.Issue) ([]*github.IssueComment, 
 	log := g.config.GetLogger()
 
 	ctx := context.Background()
-	user, repo := g.config.GetRepo()
 	c, _, err := g.request(func() (interface{}, *github.Response, error) {
-		return g.client.Issues.ListComments(ctx, user, repo, issue.GetNumber(), &github.IssueListCommentsOptions{
+		return g.client.Issues.ListComments(ctx, issue.User.GetName(), issue.Repository.GetName(), issue.GetNumber(), &github.IssueListCommentsOptions{
 			Sort:      "created",
 			Direction: "asc",
 		})
