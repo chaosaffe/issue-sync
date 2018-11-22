@@ -221,11 +221,12 @@ func (g realGHClient) request(f func() (interface{}, *github.Response, error)) (
 	b.MaxElapsedTime = g.config.GetTimeout()
 
 	backoffErr := backoff.RetryNotify(op, b, func(err error, duration time.Duration) {
+
 		// Round to a whole number of milliseconds
 		duration /= RetryBackoffRoundRatio // Convert nanoseconds to milliseconds
 		duration *= RetryBackoffRoundRatio // Convert back so it appears correct
 
-		log.Errorf("Error performing operation; retrying in %v: %v", duration, err)
+		log.Errorf("unable to complete github request; retrying in %v: %v", duration, err)
 	})
 
 	return ret, res, backoffErr
