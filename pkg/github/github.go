@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"time"
 
@@ -134,7 +135,8 @@ func (g realGHClient) ListComments(issue github.Issue) ([]*github.IssueComment, 
 
 	ctx := context.Background()
 	c, _, err := g.request(func() (interface{}, *github.Response, error) {
-		return g.client.Issues.ListComments(ctx, issue.User.GetName(), issue.Repository.GetName(), issue.GetNumber(), &github.IssueListCommentsOptions{
+		splitURL := strings.Split(issue.GetURL(), "/")
+		return g.client.Issues.ListComments(ctx, splitURL[4], splitURL[5], issue.GetNumber(), &github.IssueListCommentsOptions{
 			Sort:      "created",
 			Direction: "asc",
 		})
