@@ -41,8 +41,6 @@ func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 	pages := 1
 	var issues []github.Issue
 
-	//query += " updated:" + g.config.GetSinceParam().Format(time.RFC3339)
-
 	for page := 1; page <= pages; page++ {
 		is, res, err := g.request(func() (interface{}, *github.Response, error) {
 			return g.client.Search.Issues(ctx, query, &github.SearchOptions{
