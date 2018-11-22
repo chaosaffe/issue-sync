@@ -312,14 +312,6 @@ func (c *Config) validateConfig() error {
 		}
 	}
 
-	repo := c.cmdConfig.GetString("repo-name")
-	if repo == "" {
-		return errors.New("GitHub repository required")
-	}
-	if !strings.Contains(repo, "/") || len(strings.Split(repo, "/")) != 2 {
-		return errors.New("GitHub repository must be of form user/repo")
-	}
-
 	uri := c.cmdConfig.GetString("jira-uri")
 	if uri == "" {
 		return errors.New("JIRA URI required")
