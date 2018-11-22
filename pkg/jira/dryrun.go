@@ -65,6 +65,9 @@ func (j dryrunJIRAClient) ListIssues(ids []int) ([]jira.Issue, error) {
 		// Filter only issues which have a defined GitHub ID in the list of IDs
 		for _, v := range jiraIssues {
 			if id, err := v.Fields.Unknowns.Int(j.cfg.GetFieldKey(config.GitHubID)); err == nil {
+			if val, _ := v.Fields.Unknowns.Value(ghIDFieldKey); val == nil {
+				continue
+			}
 				for _, idOpt := range ids {
 					if id == int64(idOpt) {
 						issues = append(issues, v)
