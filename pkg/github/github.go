@@ -53,22 +53,16 @@ func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 		if err != nil {
 			return nil, err
 		}
-		issuePointers, ok := is.([]*github.Issue)
+
+		isr, ok := is.(*github.IssuesSearchResult)
 		if !ok {
 			log.Errorf("Search GitHub issues did not return issues! Got: %v", is)
-			return nil, fmt.Errorf("get GitHub issues failed: expected []*github.Issue; got %T", is)
-		}
-
-		var issuePage []github.Issue
-		for _, v := range issuePointers {
-			// If PullRequestLinks is not nil, it's a Pull Request
-			if v.PullRequestLinks == nil {
-				issuePage = append(issuePage, *v)
-			}
+			return nil, fmt.Errorf("search GitHub issues failed: expected []*github.IssuesSearchResult; got %T", is)
 		}
 
 		pages = res.LastPage
-		issues = append(issues, issuePage...)
+
+		issues = append(issues, isr.Issues...)
 	}
 
 	log.Debug("Collected all GitHub issues")
