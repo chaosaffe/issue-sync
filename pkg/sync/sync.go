@@ -32,7 +32,9 @@ func Sync(cfg config.Config, ghClient ghClient.GitHubClient, jiraClient jClient.
 
 func getGitHubIssues(cfg config.Config, ghClient ghClient.GitHubClient) ([]github.Issue, error) {
 
-	return []github.Issue{}, nil
+	query := buildQuery(cfg)
+
+	return ghClient.SearchIssues(query)
 
 }
 
