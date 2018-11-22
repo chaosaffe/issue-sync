@@ -24,7 +24,7 @@ func CompareIssues(cfg config.Config, ghIssues []github.Issue, ghClient ghClient
 	log.Debug("Collecting issues")
 
 	if len(ghIssues) == 0 {
-		log.Info("There are no GitHub issues; exiting")
+		log.Info("No GitHub Issues retrieved")
 		return nil
 	}
 
