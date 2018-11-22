@@ -44,7 +44,6 @@ func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 	for page := 1; page <= pages; page++ {
 		is, res, err := g.request(func() (interface{}, *github.Response, error) {
 			return g.client.Search.Issues(ctx, query, &github.SearchOptions{
-				Sort: "created",
 				ListOptions: github.ListOptions{
 					Page:    page,
 					PerPage: 100,
