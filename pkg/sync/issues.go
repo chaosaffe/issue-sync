@@ -170,7 +170,7 @@ func CreateIssue(cfg config.Config, issue github.Issue, ghClient ghClient.GitHub
 
 	fields := jira.IssueFields{
 		Type: jira.IssueType{
-			Name: "Task", // TODO: Determine issue type
+			Name: "Aufgabe", // TODO: Determine issue type
 		},
 		Project:     cfg.GetProject(),
 		Summary:     issue.GetTitle(),
