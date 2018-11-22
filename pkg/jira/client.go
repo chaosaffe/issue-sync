@@ -150,11 +150,12 @@ func (j realJIRAClient) ListIssues(ids []int) ([]jira.Issue, error) {
 		issues = jiraIssues
 	} else {
 		// Filter only issues which have a defined GitHub ID in the list of IDs
+		ghIDFieldKey := j.cfg.GetFieldKey(config.GitHubID)
 		for _, v := range jiraIssues {
-			if id, err := v.Fields.Unknowns.Int(j.cfg.GetFieldKey(config.GitHubID)); err == nil {
 			if val, _ := v.Fields.Unknowns.Value(ghIDFieldKey); val == nil {
 				continue
 			}
+			if id, err := v.Fields.Unknowns.Int(ghIDFieldKey); err == nil {
 				for _, idOpt := range ids {
 					if id == int64(idOpt) {
 						issues = append(issues, v)
