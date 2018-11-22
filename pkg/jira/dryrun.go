@@ -260,7 +260,7 @@ func (j dryrunJIRAClient) request(f func() (interface{}, *jira.Response, error))
 		duration /= ghClient.RetryBackoffRoundRatio // Convert nanoseconds to milliseconds
 		duration *= ghClient.RetryBackoffRoundRatio // Convert back so it appears correct
 
-		log.Errorf("Error performing operation; retrying in %v: %v", duration, err)
+		log.Errorf("unable to complete dryrun request; retrying in %v: %v", duration, err)
 	})
 
 	return ret, res, backoffErr

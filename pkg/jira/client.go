@@ -199,6 +199,7 @@ func (j realJIRAClient) CreateIssue(issue jira.Issue) (jira.Issue, error) {
 	i, res, err := j.request(func() (interface{}, *jira.Response, error) {
 		return j.client.Issue.Create(&issue)
 	})
+
 	if err != nil {
 		log.Errorf("Error creating JIRA issue: %v", err)
 		return jira.Issue{}, getErrorBody(j.cfg, res)
@@ -367,7 +368,7 @@ func (j realJIRAClient) request(f func() (interface{}, *jira.Response, error)) (
 		duration /= ghClient.RetryBackoffRoundRatio // Convert nanoseconds to milliseconds
 		duration *= ghClient.RetryBackoffRoundRatio // Convert back so it appears correct
 
-		log.Errorf("Error performing operation; retrying in %v: %v", duration, err)
+		log.Errorf("unable to complete jira request; retrying in %v: %v", duration, err)
 	})
 
 	return ret, res, backoffErr
