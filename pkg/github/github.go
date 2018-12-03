@@ -19,6 +19,7 @@ import (
 type GitHubClient interface {
 	ListIssues() ([]github.Issue, error)
 	ListComments(issue github.Issue) ([]*github.IssueComment, error)
+	GetMembers(org string) ([]*github.User, error)
 	GetUser(login string) (github.User, error)
 	GetRateLimits() (github.RateLimits, error)
 	SearchIssues(query string) ([]github.Issue, error)
@@ -152,6 +153,27 @@ func (g realGHClient) ListComments(issue github.Issue) ([]*github.IssueComment, 
 	}
 
 	return comments, nil
+}
+
+// GetMembers returns a set of GitHub users from an Organisation.
+func (g realGHClient) GetMembers(org string) ([]*github.User, error) {
+	log := g.config.GetLogger()
+
+	u, _, err := g.request(func() (interface{}, *github.Response, error) {
+		return g.client.Organizations.ListMembers(context.Background(), org, &github.ListMembersOptions{})
+	})
+
+	if err != nil {
+		log.Errorf("Error retrieving GitHub organisation %s. Error: %v", org, err)
+	}
+
+	users, ok := u.([]*github.User)
+	if !ok {
+		log.Errorf("Get GitHub user did not return users! Got: %v", u)
+		return []*github.User{}, fmt.Errorf("Get GitHub user failed: expected *github.User; got %T", u)
+	}
+
+	return users, nil
 }
 
 // GetUser returns a GitHub user from its login.
