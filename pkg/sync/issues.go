@@ -21,8 +21,6 @@ const dateFormat = "2006-01-02T15:04:05.0-0700"
 func CompareIssues(cfg config.Config, ghIssues []github.Issue, ghClient ghClient.GitHubClient, jiraClient jClient.JIRAClient) error {
 	log := cfg.GetLogger()
 
-	log.Debug("Collecting issues")
-
 	if len(ghIssues) == 0 {
 		log.Info("No GitHub Issues retrieved")
 		return nil
@@ -33,12 +31,14 @@ func CompareIssues(cfg config.Config, ghIssues []github.Issue, ghClient ghClient
 		ids[i] = v.GetID()
 	}
 
+	log.Debug("Collecting JIRA issues")
+
 	jiraIssues, err := jiraClient.ListIssues(ids)
 	if err != nil {
 		return err
 	}
 
-	log.Debug("Collected all JIRA issues")
+	log.Debug("Collected JIRA issues")
 
 	for _, ghIssue := range ghIssues {
 		found := false

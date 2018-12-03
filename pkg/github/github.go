@@ -37,6 +37,8 @@ type realGHClient struct {
 func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 	log := g.config.GetLogger()
 
+	log.Debug("Collecting GitHub issues")
+
 	ctx := context.Background()
 
 	// Set it so that it will run the loop once, and it'll be updated in the loop.
@@ -67,7 +69,7 @@ func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 		issues = append(issues, isr.Issues...)
 	}
 
-	log.Debug("Collected all GitHub issues")
+	log.Debug("Collected GitHub issues")
 
 	return issues, nil
 }
@@ -75,6 +77,8 @@ func (g realGHClient) SearchIssues(query string) ([]github.Issue, error) {
 // ListIssues returns the list of GitHub issues since the last run of the tool.
 func (g realGHClient) ListIssues() ([]github.Issue, error) {
 	log := g.config.GetLogger()
+
+	log.Debug("Collecting GitHub issues")
 
 	ctx := context.Background()
 
@@ -124,7 +128,7 @@ func (g realGHClient) ListIssues() ([]github.Issue, error) {
 		}
 	}
 
-	log.Debug("Collected all GitHub issues")
+	log.Debug("Collected GitHub issues")
 
 	return issues, nil
 }
