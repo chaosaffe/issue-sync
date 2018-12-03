@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -16,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // dateFormat is the format used for the `since` configuration parameter
@@ -166,7 +166,7 @@ func (c *Config) SaveConfig() error {
 	var cf configFile
 	c.cmdConfig.Unmarshal(&cf)
 
-	b, err := json.MarshalIndent(cf, "", "  ")
+	b, err := yaml.Marshal(cf)
 	if err != nil {
 		return err
 	}
