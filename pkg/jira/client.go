@@ -71,8 +71,6 @@ func NewJIRAClient(cfg *config.Config) (JIRAClient, error) {
 		}
 	}
 
-	var j JIRAClient
-
 	client, err := jira.NewClient(oauth, cfg.GetConfigString("jira-uri"))
 	if err != nil {
 		log.Errorf("Error initializing JIRA clients; check your base URI. Error: %v", err)
@@ -86,6 +84,8 @@ func NewJIRAClient(cfg *config.Config) (JIRAClient, error) {
 	log.Debug("JIRA clients initialized")
 
 	cfg.LoadJIRAConfig(*client)
+
+	var j JIRAClient
 
 	if cfg.IsDryRun() {
 		j = dryrunJIRAClient{
