@@ -32,14 +32,14 @@ func Sync(cfg config.Config, ghClient ghClient.GitHubClient, jiraClient jClient.
 
 func getGitHubIssues(cfg config.Config, ghClient ghClient.GitHubClient) ([]github.Issue, error) {
 
-	query := buildQuery(cfg)
+	query := buildQuery(cfg, ghClient)
 
 	return ghClient.SearchIssues(query)
 
 }
 
-func buildQuery(cfg config.Config) (q string) {
-	q += buildUserQuery()
+func buildQuery(cfg config.Config, ghClient ghClient.GitHubClient) (q string) {
+	q += buildUserQuery(cfg, ghClient)
 
 	q += buildOrgQuery(cfg.GetRepos())
 
@@ -71,12 +71,16 @@ func buildRepoQuery(org config.Organisation) (q string) {
 	return q
 }
 
-func buildUserQuery() (q string) {
-	// TODO: get users from gh org
-	users := []string{"chaosaffe", "chrigl", "ainmosni", "syjabri"}
+func buildUserQuery(cfg config.Config, ghClient ghClient.GitHubClient) (q string) {
+
+	users, err := ghClient.GetMembers(cfg.GetSourceOrganisation())
+	if err != nil {
+		// TODO: bubble up err
+		panic(err)
+	}
 
 	for _, user := range users {
-		q += fmt.Sprintf("involves:%s ", user)
+		q += fmt.Sprintf("involves:%s ", user.GetLogin())
 	}
 
 	return q
