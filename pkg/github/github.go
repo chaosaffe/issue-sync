@@ -30,7 +30,7 @@ type GitHubClient interface {
 // of GitHubClient.
 type realGHClient struct {
 	config config.Config
-	client github.Client
+	client *github.Client
 }
 
 // SearchIssues returns the list of GitHub issues since the last run of the tool based on the search query.
@@ -203,7 +203,7 @@ func (g realGHClient) GetUser(login string) (github.User, error) {
 
 // GetRateLimits returns the current rate limits on the GitHub API. This is a
 // simple and lightweight request that can also be used simply for testing the API.
-func (g realGHClient) GetRateLimits() (github.RateLimits, error) {
+func (g *realGHClient) GetRateLimits() (github.RateLimits, error) {
 	log := g.config.GetLogger()
 
 	ctx := context.Background()
@@ -231,7 +231,7 @@ const RetryBackoffRoundRatio = time.Millisecond / time.Nanosecond
 // returns the expected value and the GitHub API response, as well as a nil
 // error. If it continues to fail until a maximum time is reached, it returns
 // a nil result as well as the returned HTTP response and a timeout error.
-func (g realGHClient) request(f func() (interface{}, *github.Response, error)) (interface{}, *github.Response, error) {
+func (g *realGHClient) request(f func() (interface{}, *github.Response, error)) (interface{}, *github.Response, error) {
 	log := g.config.GetLogger()
 
 	var ret interface{}
@@ -276,15 +276,15 @@ func NewGitHubClient(config config.Config) (GitHubClient, error) {
 
 	client := github.NewClient(tc)
 
-	ret = realGHClient{
+	ret = &realGHClient{
 		config: config,
-		client: *client,
+		client: client,
 	}
 
 	// Make a request so we can check that we can connect fine.
 	_, err := ret.GetRateLimits()
 	if err != nil {
-		return realGHClient{}, err
+		return &realGHClient{}, err
 	}
 	log.Debug("Successfully connected to GitHub.")
 
