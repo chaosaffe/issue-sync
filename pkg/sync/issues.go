@@ -73,7 +73,7 @@ func DidIssueChange(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue) 
 	anyDifferent := false
 
 	anyDifferent = anyDifferent || (ghIssue.GetTitle() != jIssue.Fields.Summary)
-	anyDifferent = anyDifferent || (ghIssue.GetBody() != jIssue.Fields.Description)
+	anyDifferent = anyDifferent || (filterIssueBody(ghIssue.GetBody()) != jIssue.Fields.Description)
 
 	key := cfg.GetFieldKey(config.GitHubStatus)
 	field, err := jIssue.Fields.Unknowns.String(key)
