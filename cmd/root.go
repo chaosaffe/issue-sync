@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/coreos/issue-sync/cfg"
-	"github.com/coreos/issue-sync/lib"
-	"github.com/coreos/issue-sync/lib/clients"
+	"github.com/chaosaffe/issue-sync/pkg/config"
+	"github.com/chaosaffe/issue-sync/pkg/github"
+	"github.com/chaosaffe/issue-sync/pkg/jira"
+	"github.com/chaosaffe/issue-sync/pkg/sync"
 	"github.com/spf13/cobra"
 )
 
@@ -23,37 +24,40 @@ func Execute() {
 var RootCmd = &cobra.Command{
 	Use:   "issue-sync [options]",
 	Short: "A tool to synchronize GitHub and JIRA issues",
-	Long:  "Full docs coming later; see https://github.com/coreos/issue-sync",
+	Long:  "Full docs coming later; see https://github.com/chaosaffe/issue-sync",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		config, err := cfg.NewConfig(cmd)
+		cfg, err := config.NewConfig(cmd)
 		if err != nil {
 			return err
 		}
 
-		log := config.GetLogger()
+		log := cfg.GetLogger()
 
-		jiraClient, err := clients.NewJIRAClient(&config)
+		jiraClient, err := jira.NewJIRAClient(&cfg)
 		if err != nil {
 			return err
 		}
-		ghClient, err := clients.NewGitHubClient(config)
+		ghClient, err := github.NewGitHubClient(cfg)
 		if err != nil {
 			return err
 		}
 
 		for {
-			if err := lib.CompareIssues(config, ghClient, jiraClient); err != nil {
+			err := sync.Sync(cfg, ghClient, jiraClient)
+			if err != nil {
 				log.Error(err)
 			}
-			if !config.IsDryRun() {
-				if err := config.SaveConfig(); err != nil {
+
+			if !cfg.IsDryRun() {
+				err := cfg.SaveConfig()
+				if err != nil {
 					log.Error(err)
 				}
 			}
-			if !config.IsDaemon() {
+			if !cfg.IsDaemon() {
 				return nil
 			}
-			<-time.After(config.GetDaemonPeriod())
+			<-time.After(cfg.GetDaemonPeriod())
 		}
 	},
 }
@@ -64,7 +68,6 @@ func init() {
 	RootCmd.PersistentFlags().StringP("github-token", "t", "", "Set the API Token used to access the GitHub repo")
 	RootCmd.PersistentFlags().StringP("jira-user", "u", "", "Set the JIRA username to authenticate with")
 	RootCmd.PersistentFlags().StringP("jira-pass", "p", "", "Set the JIRA password to authenticate with")
-	RootCmd.PersistentFlags().StringP("repo-name", "r", "", "Set the repository path (should be form owner/repo)")
 	RootCmd.PersistentFlags().StringP("jira-uri", "U", "", "Set the base uri of the JIRA instance")
 	RootCmd.PersistentFlags().StringP("jira-project", "P", "", "Set the key of the JIRA project")
 	RootCmd.PersistentFlags().StringP("since", "s", "1970-01-01T00:00:00+0000", "Set the day that the update should run forward from")

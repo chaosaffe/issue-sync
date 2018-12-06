@@ -1,0 +1,5 @@
+log-level: debug
+repos:
+  - name: kubernetes
+    repos:
+      - kubernetes

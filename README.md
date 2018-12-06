@@ -1,9 +1,23 @@
+# WIP: This is a heavy rework of issue-sync, which may or may not be accepted upstream.
+
+The documentation below **does not** represent the current state of the project.
+For usage you will have to read the code while the refactoring is underway.
+
 # issue-sync
 
 Issue-sync is a tool for synchronizing GitHub and JIRA issues. It grew
 out of a desire to maintain a public GitHub repo while tracking private
 issues in a JIRA board; rather than require people to keep up with both
 sources, we decided to make *one* the single source of truth.
+
+## To Do
+
+  - [ ] filter users based on gh org membership
+  - [ ] md -> jira syntax handling (i.e. https://github.com/FokkeZB/J2M/blob/master/src/J2M.js)
+  - [ ] issue transitions
+  - [ ] issue assignments
+  - [ ] issue type selection
+  - [ ] issue labels
 
 ## Usage
 
