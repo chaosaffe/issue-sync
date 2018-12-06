@@ -12,8 +12,8 @@ import (
 
 	"github.com/andygrunwald/go-jira"
 	"github.com/cenkalti/backoff"
-	"github.com/chaosaffe/issue-sync/pkg/config"
-	ghClient "github.com/chaosaffe/issue-sync/pkg/github"
+	"github.com/innovocloud/issue-sync/pkg/config"
+	ghClient "github.com/innovocloud/issue-sync/pkg/github"
 	"github.com/google/go-github/github"
 )
 
@@ -361,7 +361,7 @@ func (j realJIRAClient) request(f func() (interface{}, *jira.Response, error)) (
 	b := backoff.NewExponentialBackOff()
 	b.MaxElapsedTime = j.cfg.GetTimeout()
 
-	// TODO:(chaosaffe) Fix this import
+	// TODO:(innovocloud) Fix this import
 
 	backoffErr := backoff.RetryNotify(op, b, func(err error, duration time.Duration) {
 		// Round to a whole number of milliseconds

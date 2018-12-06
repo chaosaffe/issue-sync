@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chaosaffe/issue-sync/pkg/config"
-	ghClient "github.com/chaosaffe/issue-sync/pkg/github"
-	jClient "github.com/chaosaffe/issue-sync/pkg/jira"
+	"github.com/innovocloud/issue-sync/pkg/config"
+	ghClient "github.com/innovocloud/issue-sync/pkg/github"
+	jClient "github.com/innovocloud/issue-sync/pkg/jira"
 	"github.com/google/go-github/github"
 )
 

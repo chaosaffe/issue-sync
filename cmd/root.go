@@ -4,10 +4,10 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/chaosaffe/issue-sync/pkg/config"
-	"github.com/chaosaffe/issue-sync/pkg/github"
-	"github.com/chaosaffe/issue-sync/pkg/jira"
-	"github.com/chaosaffe/issue-sync/pkg/sync"
+	"github.com/innovocloud/issue-sync/pkg/config"
+	"github.com/innovocloud/issue-sync/pkg/github"
+	"github.com/innovocloud/issue-sync/pkg/jira"
+	"github.com/innovocloud/issue-sync/pkg/sync"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +24,7 @@ func Execute() {
 var RootCmd = &cobra.Command{
 	Use:   "issue-sync [options]",
 	Short: "A tool to synchronize GitHub and JIRA issues",
-	Long:  "Full docs coming later; see https://github.com/chaosaffe/issue-sync",
+	Long:  "Full docs coming later; see https://github.com/innovocloud/issue-sync",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.NewConfig(cmd)
 		if err != nil {
