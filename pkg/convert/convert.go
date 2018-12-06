@@ -1,30 +1,28 @@
 package convert
 
 import (
-  "regexp"
-  "strings"
-  )
+	"regexp"
+	"strings"
+)
 
 // This is a go port of github.com/FokkeZB/J2M
 
 func ToJira(markdown string) (out string) {
-  out=markdown
+	out = markdown
 
 	// remove html comments
 	var comment = regexp.MustCompile(`(?s:<!--.*?-->)`)
 	out = comment.ReplaceAllString(out, "")
 
-  // multi-line comments
-  var multiLineCode = regexp.MustCompile("(?s:`{3}([a-z-]+)?(.*?)`{3})")
-  out = multiLineCode.ReplaceAllString(out, "{code:$1}$2{code}")
-  // fix empty syntax blocks
-  out= strings.Replace(out, "{code:}", "{code}", -1)
+	// multi-line comments
+	var multiLineCode = regexp.MustCompile("(?s:`{3}([a-z-]+)?(.*?)`{3})")
+	out = multiLineCode.ReplaceAllString(out, "{code:$1}$2{code}")
+	// fix empty syntax blocks
+	out = strings.Replace(out, "{code:}", "{code}", -1)
 
-  // bold
-  var bold = regexp.MustCompile(`(?s:\*{2}(.*?)\*{2})`)
-  out = bold.ReplaceAllString(out, "*$1*")
-
-
+	// bold
+	var bold = regexp.MustCompile(`(?s:\*{2}(.*?)\*{2})`)
+	out = bold.ReplaceAllString(out, "*$1*")
 
 	return out
 }
