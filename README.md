@@ -12,12 +12,13 @@ sources, we decided to make *one* the single source of truth.
 
 ## To Do
 
-  - [ ] filter users based on gh org membership
-  - [ ] md -> jira syntax handling (i.e. https://github.com/FokkeZB/J2M/blob/master/src/J2M.js)
+  - [x] filter users based on gh org membership
+  - [!] md -> jira syntax handling (i.e. https://github.com/FokkeZB/J2M/blob/master/src/J2M.js) _Partially implemented_
   - [ ] issue transitions
   - [ ] issue assignments
   - [ ] issue type selection
   - [ ] issue labels
+  - [ ] sprint assignment
 
 ## Usage
 
