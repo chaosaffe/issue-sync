@@ -5,10 +5,11 @@ import (
 	"time"
 
 	"github.com/andygrunwald/go-jira"
+	"github.com/google/go-github/github"
 	"github.com/innovocloud/issue-sync/pkg/config"
+	"github.com/innovocloud/issue-sync/pkg/convert"
 	ghClient "github.com/innovocloud/issue-sync/pkg/github"
 	jClient "github.com/innovocloud/issue-sync/pkg/jira"
-	"github.com/google/go-github/github"
 )
 
 // dateFormat is the format used for the Last IS Update field
@@ -97,7 +98,7 @@ func DidIssueChange(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue) 
 		anyDifferent = true
 	}
 
-	log.Debugf("Issues have any differences: %t", anyDifferent)
+	log.Debugf("Issues have differences: %t", anyDifferent)
 
 	return anyDifferent
 }
@@ -117,7 +118,7 @@ func UpdateIssue(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue, ghC
 		fields.Unknowns = map[string]interface{}{}
 
 		fields.Summary = ghIssue.GetTitle()
-		fields.Description = ghIssue.GetBody()
+		fields.Description = filterIssueBody(ghIssue.GetBody())
 		fields.Unknowns[cfg.GetFieldKey(config.GitHubStatus)] = ghIssue.GetState()
 		fields.Unknowns[cfg.GetFieldKey(config.GitHubReporter)] = ghIssue.User.GetLogin()
 
@@ -161,6 +162,10 @@ func UpdateIssue(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue, ghC
 	return nil
 }
 
+func filterIssueBody(body string) string {
+	return convert.ToJira(body)
+}
+
 // CreateIssue generates a JIRA issue from the various fields on the given GitHub issue, then
 // sends it to the JIRA API.
 func CreateIssue(cfg config.Config, issue github.Issue, ghClient ghClient.GitHubClient, jClient jClient.JIRAClient) error {
@@ -174,7 +179,7 @@ func CreateIssue(cfg config.Config, issue github.Issue, ghClient ghClient.GitHub
 		},
 		Project:     cfg.GetProject(),
 		Summary:     issue.GetTitle(),
-		Description: issue.GetBody(),
+		Description: filterIssueBody(issue.GetBody()),
 		Unknowns:    map[string]interface{}{},
 	}
 
