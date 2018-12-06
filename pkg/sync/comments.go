@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -101,7 +100,7 @@ func UpdateComment(config config.Config, ghComment github.IssueComment, jComment
 		return err
 	}
 
-	log.Debug(fmt.Sprintf("Updated JIRA comment %s.", comment.ID))
+	log.Debugf("Updated JIRA comment %s.", comment.ID)
 
 	return nil
 }
