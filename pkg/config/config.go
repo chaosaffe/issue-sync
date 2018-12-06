@@ -152,19 +152,19 @@ func (c Config) GetSourceOrganisation() string {
 
 // configFile is a serializable representation of the current Viper configuration.
 type configFile struct {
-	GithubToken         string         `json:"github-token" mapstructure:"github-token"`
-	GitHubRepos         []Organisation `json:"repos" mapstructure:"repos"`
-	GitHubUserSourceOrg string         `json:"github-user-source-org" mapstructure:"github-user-source-org"`
-	JIRAUser            string         `json:"jira-user" mapstructure:"jira-user"`
-	JIRAToken           string         `json:"jira-token" mapstructure:"jira-token"`
-	JIRASecret          string         `json:"jira-secret" mapstructure:"jira-secret"`
-	JIRAKey             string         `json:"jira-private-key-path" mapstructure:"jira-private-key-path"`
-	JIRACKey            string         `json:"jira-consumer-key" mapstructure:"jira-consumer-key"`
-	JIRAURI             string         `json:"jira-uri" mapstructure:"jira-uri"`
-	JIRAProject         string         `json:"jira-project" mapstructure:"jira-project"`
-	LogLevel            string         `json:"log-level" mapstructure:"log-level"`
-	Since               string         `json:"since" mapstructure:"since"`
-	Timeout             time.Duration  `json:"timeout" mapstructure:"timeout"`
+	GithubToken         string         `yaml:"github-token,omitempty" mapstructure:"github-token"`
+	GitHubRepos         []Organisation `yaml:"repos,omitempty" mapstructure:"repos"`
+	GitHubUserSourceOrg string         `yaml:"github-user-source-org,omitempty" mapstructure:"github-user-source-org"`
+	JIRAUser            string         `yaml:"jira-user,omitempty" mapstructure:"jira-user"`
+	JIRAToken           string         `yaml:"jira-token,omitempty" mapstructure:"jira-token"`
+	JIRASecret          string         `yaml:"jira-secret,omitempty" mapstructure:"jira-secret"`
+	JIRAKey             string         `yaml:"jira-private-key-path,omitempty" mapstructure:"jira-private-key-path"`
+	JIRACKey            string         `yaml:"jira-consumer-key,omitempty" mapstructure:"jira-consumer-key"`
+	JIRAURI             string         `yaml:"jira-uri,omitempty" mapstructure:"jira-uri"`
+	JIRAProject         string         `yaml:"jira-project,omitempty" mapstructure:"jira-project"`
+	LogLevel            string         `yaml:"log-level,omitempty" mapstructure:"log-level"`
+	Since               string         `yaml:"since,omitempty" mapstructure:"since"`
+	Timeout             time.Duration  `yaml:"timeout,omitempty" mapstructure:"timeout"`
 }
 
 // SaveConfig updates the `since` parameter to now, then saves the configuration file.
