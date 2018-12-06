@@ -12,9 +12,9 @@ import (
 
 	"github.com/andygrunwald/go-jira"
 	"github.com/cenkalti/backoff"
+	"github.com/google/go-github/github"
 	"github.com/innovocloud/issue-sync/pkg/config"
 	ghClient "github.com/innovocloud/issue-sync/pkg/github"
-	"github.com/google/go-github/github"
 )
 
 // commentDateFormat is the format used in the headers of JIRA comments.
