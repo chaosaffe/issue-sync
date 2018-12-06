@@ -87,6 +87,12 @@ func DidIssueChange(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue) 
 		anyDifferent = true
 	}
 
+	key = cfg.GetFieldKey(config.GitHubURI)
+	field, err = jIssue.Fields.Unknowns.String(key)
+	if err != nil || *ghIssue.HTMLURL != field {
+		anyDifferent = true
+	}
+
 	labels := make([]string, len(ghIssue.Labels))
 	for i, l := range ghIssue.Labels {
 		labels[i] = *l.Name
@@ -121,6 +127,7 @@ func UpdateIssue(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue, ghC
 		fields.Description = filterIssueBody(ghIssue.GetBody())
 		fields.Unknowns[cfg.GetFieldKey(config.GitHubStatus)] = ghIssue.GetState()
 		fields.Unknowns[cfg.GetFieldKey(config.GitHubReporter)] = ghIssue.User.GetLogin()
+		fields.Unknowns[cfg.GetFieldKey(config.GitHubURI)] = ghIssue.GetHTMLURL()
 
 		labels := make([]string, len(ghIssue.Labels))
 		for i, l := range ghIssue.Labels {
@@ -187,6 +194,7 @@ func CreateIssue(cfg config.Config, issue github.Issue, ghClient ghClient.GitHub
 	fields.Unknowns[cfg.GetFieldKey(config.GitHubNumber)] = issue.GetNumber()
 	fields.Unknowns[cfg.GetFieldKey(config.GitHubStatus)] = issue.GetState()
 	fields.Unknowns[cfg.GetFieldKey(config.GitHubReporter)] = issue.User.GetLogin()
+	fields.Unknowns[cfg.GetFieldKey(config.GitHubURI)] = issue.GetHTMLURL()
 
 	strs := make([]string, len(issue.Labels))
 	for i, v := range issue.Labels {

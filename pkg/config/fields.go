@@ -58,6 +58,8 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 			fieldIDs.githubReporter = fmt.Sprint(field.Schema.CustomID)
 		case "Last Issue-Sync Update":
 			fieldIDs.lastUpdate = fmt.Sprint(field.Schema.CustomID)
+		case "GitHub URI":
+			fieldIDs.githubURI = fmt.Sprint(field.Schema.CustomID)
 		}
 	}
 
@@ -73,6 +75,8 @@ func (c Config) getFieldIDs(client jira.Client) (fields, error) {
 		return fieldIDs, errors.New("could not find ID of 'Github Reporter' custom field; check that it is named correctly")
 	} else if fieldIDs.lastUpdate == "" {
 		return fieldIDs, errors.New("could not find ID of 'Last Issue-Sync Update' custom field; check that it is named correctly")
+	} else if fieldIDs.lastUpdate == "" {
+		return fieldIDs, errors.New("could not find ID of 'GitHub URI' custom field; check that it is named correctly")
 	}
 
 	c.log.Debug("All fields have been checked.")
@@ -95,6 +99,8 @@ func (c Config) GetFieldID(key fieldKey) string {
 		return c.fieldIDs.githubStatus
 	case LastISUpdate:
 		return c.fieldIDs.lastUpdate
+	case GitHubURI:
+		return c.fieldIDs.githubURI
 	default:
 		return ""
 	}
@@ -115,6 +121,7 @@ const (
 	GitHubStatus   fieldKey = iota
 	GitHubReporter fieldKey = iota
 	LastISUpdate   fieldKey = iota
+	GitHubURI      fieldKey = iota
 )
 
 // fields represents the custom field IDs of the JIRA custom fields we care about
@@ -125,4 +132,5 @@ type fields struct {
 	githubReporter string
 	githubStatus   string
 	lastUpdate     string
+	githubURI      string
 }
