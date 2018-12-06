@@ -97,7 +97,7 @@ func DidIssueChange(cfg config.Config, ghIssue github.Issue, jIssue jira.Issue) 
 		anyDifferent = true
 	}
 
-	log.Debugf("Issues have any differences: %t", anyDifferent)
+	log.Debugf("Issues have differences: %t", anyDifferent)
 
 	return anyDifferent
 }
