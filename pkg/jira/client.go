@@ -78,7 +78,7 @@ func NewJIRAClient(cfg *config.Config) (JIRAClient, error) {
 	}
 
 	if cfg.IsBasicAuth() {
-		client.Authentication.SetBasicAuth(cfg.GetConfigString("jira-user"), cfg.GetConfigString("jira-pass"))
+		client.Authentication.SetBasicAuth(cfg.GetConfigString("jira-user"), cfg.GetConfigString("jira-secret"))
 	}
 
 	log.Debug("JIRA clients initialized")

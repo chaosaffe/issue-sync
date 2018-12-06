@@ -271,7 +271,7 @@ func (c *Config) validateConfig() error {
 		return errors.New("GitHub token required")
 	}
 
-	c.basicAuth = (c.cmdConfig.GetString("jira-user") != "") && (c.cmdConfig.GetString("jira-pass") != "")
+	c.basicAuth = (c.cmdConfig.GetString("jira-user") != "") && (c.cmdConfig.GetString("jira-secret") != "")
 
 	if c.basicAuth {
 		c.log.Debug("Using HTTP Basic Authentication")
@@ -281,7 +281,7 @@ func (c *Config) validateConfig() error {
 			return errors.New("Jira username required")
 		}
 
-		jPass := c.cmdConfig.GetString("jira-pass")
+		jPass := c.cmdConfig.GetString("jira-secret")
 		if jPass == "" {
 			fmt.Print("Enter your JIRA password: ")
 			bytePass, err := terminal.ReadPassword(int(syscall.Stdin))
@@ -289,7 +289,7 @@ func (c *Config) validateConfig() error {
 				return errors.New("JIRA password required")
 			}
 			fmt.Println()
-			c.cmdConfig.Set("jira-pass", string(bytePass))
+			c.cmdConfig.Set("jira-secret", string(bytePass))
 		}
 	} else {
 		c.log.Debug("Using OAuth 1.0a authentication")
