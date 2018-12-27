@@ -67,7 +67,7 @@ func init() {
 	RootCmd.PersistentFlags().String("config", "", "Config file (default is $HOME/.issue-sync.json)")
 	RootCmd.PersistentFlags().StringP("github-token", "t", "", "Set the API Token used to access the GitHub repo")
 	RootCmd.PersistentFlags().StringP("jira-user", "u", "", "Set the JIRA username to authenticate with")
-	RootCmd.PersistentFlags().StringP("jira-pass", "p", "", "Set the JIRA password to authenticate with")
+	RootCmd.PersistentFlags().StringP("jira-secret", "p", "", "Set the JIRA password to authenticate with")
 	RootCmd.PersistentFlags().StringP("jira-uri", "U", "", "Set the base uri of the JIRA instance")
 	RootCmd.PersistentFlags().StringP("jira-project", "P", "", "Set the key of the JIRA project")
 	RootCmd.PersistentFlags().StringP("since", "s", "1970-01-01T00:00:00+0000", "Set the day that the update should run forward from")

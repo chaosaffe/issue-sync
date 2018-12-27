@@ -12,12 +12,13 @@ sources, we decided to make *one* the single source of truth.
 
 ## To Do
 
-  - [ ] filter users based on gh org membership
-  - [ ] md -> jira syntax handling (i.e. https://github.com/FokkeZB/J2M/blob/master/src/J2M.js)
+  - [x] filter users based on gh org membership
+  - [!] md -> jira syntax handling (i.e. https://github.com/FokkeZB/J2M/blob/master/src/J2M.js) _Partially implemented_
   - [ ] issue transitions
   - [ ] issue assignments
   - [ ] issue type selection
   - [ ] issue labels
+  - [ ] sprint assignment
 
 ## Usage
 
@@ -55,7 +56,7 @@ Name|Value Type|Example Value| Required|Default
 log-level|string|"warn"|false|"info"
 github-token|string| |true|null
 jira-user|string|"user@jira.example.com"|false|null
-jira-pass|string| |false|null
+jira-secret|string| |false|null
 jira-token|string| |false|null
 jira-secret|string| |false|null
 jira-consumer-key|string| |false|null
@@ -74,7 +75,7 @@ this value will be discarded.
 `github-token` is a personal access token used to access GitHub as a
 specific user.
 
-`jira-user` and `jira-pass` are the username (i.e. email) and password
+`jira-user` and `jira-secret` are the username (i.e. email) and password
 of the JIRA user which will be authenticated. See `Authentication` for
 more details.
 
@@ -119,7 +120,7 @@ to the current date when the tool is run, as well.
 
 ### Authentication
 
-If `jira-user` or `jira-pass` are provided, both are required, and the
+If `jira-user` or `jira-secret` are provided, both are required, and the
 application will connect to JIRA via Basic Authentication.
 
 Otherwise, OAuth will be used. In this case, the `jira-consumer-key`, which is the

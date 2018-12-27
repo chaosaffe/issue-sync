@@ -12,9 +12,9 @@ import (
 
 	"github.com/andygrunwald/go-jira"
 	"github.com/cenkalti/backoff"
+	"github.com/google/go-github/github"
 	"github.com/innovocloud/issue-sync/pkg/config"
 	ghClient "github.com/innovocloud/issue-sync/pkg/github"
-	"github.com/google/go-github/github"
 )
 
 // commentDateFormat is the format used in the headers of JIRA comments.
@@ -78,7 +78,7 @@ func NewJIRAClient(cfg *config.Config) (JIRAClient, error) {
 	}
 
 	if cfg.IsBasicAuth() {
-		client.Authentication.SetBasicAuth(cfg.GetConfigString("jira-user"), cfg.GetConfigString("jira-pass"))
+		client.Authentication.SetBasicAuth(cfg.GetConfigString("jira-user"), cfg.GetConfigString("jira-secret"))
 	}
 
 	log.Debug("JIRA clients initialized")
