@@ -8,6 +8,7 @@ import (
 // This is a go port of github.com/FokkeZB/J2M
 
 func ToJira(markdown string) (out string) {
+
 	out = markdown
 
 	// remove html comments
@@ -17,6 +18,7 @@ func ToJira(markdown string) (out string) {
 	// multi-line comments
 	var multiLineCode = regexp.MustCompile("(?s:`{3}([a-z-]+)?(.*?)`{3})")
 	out = multiLineCode.ReplaceAllString(out, "{code:$1}$2{code}")
+
 	// fix empty syntax blocks
 	out = strings.Replace(out, "{code:}", "{code}", -1)
 
