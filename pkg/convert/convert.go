@@ -15,7 +15,7 @@ func ToJira(markdown string) (out string) {
 	var comment = regexp.MustCompile(`(?s:<!--.*?-->)`)
 	out = comment.ReplaceAllString(out, "")
 
-	// multi-line comments
+	// multi-line code block
 	var multiLineCode = regexp.MustCompile("(?s:`{3}([a-z-]+)?(.*?)`{3})")
 	out = multiLineCode.ReplaceAllString(out, "{code:$1}$2{code}")
 
@@ -28,6 +28,10 @@ func ToJira(markdown string) (out string) {
 	// bold
 	var bold = regexp.MustCompile(`(?s:\*{2}(.*?)\*{2})`)
 	out = bold.ReplaceAllString(out, "*$1*")
+
+	// urls
+
+	// details block
 
 	return out
 }
