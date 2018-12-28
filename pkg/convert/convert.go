@@ -17,6 +17,9 @@ func ToJira(markdown string) (out string) {
 	// multi-line comments
 	var multiLineCode = regexp.MustCompile("(?s:`{3}([a-z-]+)?(.*?)`{3})")
 	out = multiLineCode.ReplaceAllString(out, "{code:$1}$2{code}")
+
+	// remove unknown `release-note` code block type
+	out = strings.Replace(out, "{code:release-note}", "{code}", -1)
 	// fix empty syntax blocks
 	out = strings.Replace(out, "{code:}", "{code}", -1)
 
