@@ -8,6 +8,7 @@ import (
 // This is a go port of github.com/FokkeZB/J2M
 
 func ToJira(markdown string) (out string) {
+
 	out = markdown
 
 	// remove html comments
@@ -20,6 +21,7 @@ func ToJira(markdown string) (out string) {
 
 	// remove unknown `release-note` code block type
 	out = strings.Replace(out, "{code:release-note}", "{code}", -1)
+
 	// fix empty syntax blocks
 	out = strings.Replace(out, "{code:}", "{code}", -1)
 
