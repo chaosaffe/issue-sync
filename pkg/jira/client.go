@@ -114,8 +114,6 @@ type realJIRAClient struct {
 // have GitHub IDs in the provided list. `ids` should be a comma-separated
 // list of GitHub IDs.
 func (j realJIRAClient) ListIssues(ids []int) ([]jira.Issue, error) {
-	log := j.cfg.GetLogger()
-
 	idStrs := make([]string, len(ids))
 	for i, v := range ids {
 		idStrs[i] = fmt.Sprint(v)
@@ -131,23 +129,16 @@ func (j realJIRAClient) ListIssues(ids []int) ([]jira.Issue, error) {
 		jql = fmt.Sprintf("project='%s'", j.cfg.GetProjectKey())
 	}
 
-	ji, res, err := j.request(func() (interface{}, *jira.Response, error) {
-		return j.client.Issue.Search(jql, nil)
-	})
+	jiraIssues, err := j.getIssues(jql)
 	if err != nil {
-		log.Errorf("Error retrieving JIRA issues: %v", err)
-		return nil, getErrorBody(j.cfg, res)
-	}
-	jiraIssues, ok := ji.([]jira.Issue)
-	if !ok {
-		log.Errorf("Get JIRA issues did not return issues! Got: %v", ji)
-		return nil, fmt.Errorf("get JIRA issues failed: expected []jira.Issue; got %T", ji)
+		return nil, err
 	}
 
-	var issues []jira.Issue
+	var filteredIssues []jira.Issue
+
 	if len(ids) < maxJQLIssueLength {
 		// The issues were already filtered by our JQL, so use as is
-		issues = jiraIssues
+		filteredIssues = jiraIssues
 	} else {
 		// Filter only issues which have a defined GitHub ID in the list of IDs
 		ghIDFieldKey := j.cfg.GetFieldKey(config.GitHubID)
@@ -158,12 +149,48 @@ func (j realJIRAClient) ListIssues(ids []int) ([]jira.Issue, error) {
 			if id, err := v.Fields.Unknowns.Int(ghIDFieldKey); err == nil {
 				for _, idOpt := range ids {
 					if id == int64(idOpt) {
-						issues = append(issues, v)
+						filteredIssues = append(filteredIssues, v)
 						break
 					}
 				}
 			}
 		}
+	}
+
+	return filteredIssues, nil
+}
+
+func (j realJIRAClient) getIssues(jql string) ([]jira.Issue, error) {
+	log := j.cfg.GetLogger()
+	var issues []jira.Issue
+
+	const maxResults = 50
+	// force at least one interation to occur
+	totalResults := 1
+
+	for page := 0; (page * maxResults) < totalResults; page++ {
+		ji, res, err := j.request(func() (interface{}, *jira.Response, error) {
+			opts := &jira.SearchOptions{
+				StartAt:    (maxResults * page),
+				MaxResults: maxResults,
+			}
+			return j.client.Issue.Search(jql, opts)
+		})
+
+		if err != nil {
+			log.Errorf("Error retrieving JIRA issues: %v", err)
+			return nil, getErrorBody(j.cfg, res)
+		}
+
+		totalResults = res.Total
+
+		jiraIssues, ok := ji.([]jira.Issue)
+		if !ok {
+			log.Errorf("Get JIRA issues did not return issues! Got: %v", ji)
+			return nil, fmt.Errorf("get JIRA issues failed: expected []jira.Issue; got %T", ji)
+		}
+
+		issues = append(issues, jiraIssues...)
 	}
 
 	return issues, nil
